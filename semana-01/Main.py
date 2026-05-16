@@ -23,3 +23,11 @@ def line_processor (original_line):
         except ValueError:
             pass
     return total
+
+def main():
+    for line in sys.stdin:
+        result=line_processor(line)
+        print(result)
+
+if __name__ == '__main__':
+    main()        
