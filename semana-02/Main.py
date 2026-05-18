@@ -1,21 +1,19 @@
 import sys
 
-def fahrenheit_to_celcius(fahrenheit):
+def fahrenheit_a_celsius(fahrenheit):
     return (fahrenheit - 32) * 5 / 9
 
-def temp_classifier(celcius):
-    if celcius < 0:
+def temp_classifier(celsius):
+    if celsius < 0:
         return "Congelante"
-    elif 0 <= celcius <= 15:
-        return "Frío"
-    elif 15 < celcius <= 25:
+    elif celsius <= 15:
+        return "Frio"
+    elif celsius <= 25:
         return "Templado"
-    elif 25 < celcius <= 35:
-        return "Cálido"
-    elif 35 < celcius:
-        return "Extremo"
+    elif celsius <= 35:
+        return "Calido"
     else:
-        return "Ingrese una temperatura correcta"
+        return "Extremo"
 
 def main():
     encabezados = sys.stdin.readline()
@@ -30,26 +28,28 @@ def main():
 
         parts = [part.strip() for part in data.split(",")]
 
-        if len(parts) == 3:
-            ciudad = parts[0]
-            temperatura = parts[1]
-            unidad = parts[2].upper()
+        if len(parts) != 3:
+            continue
 
-            if unidad not in ['C', 'F']:
-                continue
+        ciudad = parts[0]
+        temperatura = parts[1]
+        unidad = parts[2].upper()
 
-            try:
-                temp_val = float(temperatura)
-            except ValueError:
-                continue
+        if unidad not in ['C', 'F']:
+            continue
 
-            if unidad == 'F':
-                temp_celcius = fahrenheit_to_celcius(temp_val)
-            else:
-                temp_celcius = temp_val
+        try:
+            temp_val = float(temperatura)
+        except ValueError:
+            continue
 
-            clasificacion = temp_classifier(temp_celcius)
-            print(f"{ciudad},{temp_celcius:.1f},{clasificacion}")
+        if unidad == 'F':
+            temp_celsius = fahrenheit_a_celsius(temp_val)
+        else:
+            temp_celsius = temp_val
+
+        clasificacion = temp_classifier(temp_celsius)
+        print(f"{ciudad},{temp_celsius:.1f},{clasificacion}")
 
 if __name__ == "__main__":
     main()
