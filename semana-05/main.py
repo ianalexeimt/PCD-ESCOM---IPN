@@ -119,3 +119,48 @@ def leer_csv (ruta):
             return encabezados, filas
     except FileNotFoundError:
         sys.exit(1)
+
+def escribir_csv (ruta, perfiles):
+    directorio=os.path.dirname(ruta)
+    if directorio and not os.path.exists(directorio):
+        os.makedirs(directorio)
+
+    columnas=['nombre_columna', 'tipo_inferido', 'total_registros', 'valores_nulos', 'porcentaje_nulos', 'valores_unicos', 'porcentaje_unicos', 'ejemplo_valor']
+
+    with open(ruta, 'w', encoding='utf-8') as f:
+        f.write(','.join(columnas) + '\n')
+
+        for p in perfiles:
+            pct_nulos_str=f"{p['porcentaje_nulos']:.2f}"
+            pct_unicos_str=f"{p['porcentaje_unicos']:.2f}"
+            valores=[str(p['nombre_columna']), str(p['tipo_inferido']), str(p['total_registros']), str(p['valores_nulos']), pct_nulos_str, str(p['valores_unicos']), pct_unicos_str, str(p['ejemplo_valor'])]
+            f.write(','.join(valores) + '\n')
+
+def main():
+    parser=argparse.ArgumentParser()
+    parser.add_argument('--input', '-i', required=True)
+    parser.add_argument('--output', '-o', required=True)
+    args=parser.parse_args()
+
+    resultado_lectura=leer_csv(args.input)
+    encabezados=resultado_lectura[0]
+    filas=resultado_lectura[1]
+
+    if not encabezados:
+        sys.exit(1)
+
+    perfiles=[]
+    for i, nombre_col in enumerate(encabezados):
+        valores=[]
+        for fila in filas:
+            if i < len(fila):
+                valores.append(fila[i])
+            else:
+                valores.append('')
+        perfil=perfilar_columna(nombre_col, valores)
+        perfiles.append(perfil)
+
+    escribir_csv(args.output, perfiles)
+
+if __name__ == '__main__':
+    main()
