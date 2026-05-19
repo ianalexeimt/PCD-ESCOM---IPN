@@ -34,3 +34,88 @@ def es_fecha (valor):
         except IndexError:
             pass
     return False
+
+
+def es_booleano (valor):
+    v=str(valor).strip().lower()
+    if v in ['true', 'false', 'yes', 'no', 'si', '1', '0', 't', 'f']:
+        return True
+    return False
+
+def inferir_tipo (valores):
+    valores_validos=[]
+    for v in valores:
+        if not es_valor_nulo(v):
+            valores_validos.append(v)
+
+    if not valores_validos:
+        return 'texto'
+
+    total=len(valores_validos)
+    umbral=0.8
+    num_fechas=0
+    num_booleanos=0
+    num_numericos=0
+
+    for v in valores_validos:
+        if es_fecha(v):
+            num_fechas+=1
+        if es_booleano(v):
+            num_booleanos+=1
+        if es_numerico(v):
+            num_numericos+=1
+
+    if num_fechas/total >= umbral:
+        return 'fecha'
+    if num_booleanos/total >= umbral:
+        return 'booleano'
+    if num_numericos/total >= umbral:
+        return 'numerico'
+    return 'texto'
+
+def perfilar_columna (nombre, valores):
+    total=len(valores)
+    nulos=0
+    valores_no_nulos=[]
+
+    for v in valores:
+        if es_valor_nulo(v):
+            nulos+=1
+        else:
+            valores_no_nulos.append(v)
+
+    unicos_set=set(valores_no_nulos)
+    unicos=len(unicos_set)
+
+    if valores_no_nulos:
+        ejemplo=valores_no_nulos[0]
+    else:
+        ejemplo=''
+
+    tipo=inferir_tipo(valores)
+
+    if total > 0:
+        pct_nulos=round(nulos/total * 100, 2)
+        pct_unicos=round(unicos/total * 100, 2)
+    else:
+        pct_nulos=0.00
+        pct_unicos=0.00
+
+    return {'nombre_columna': nombre, 'tipo_inferido': tipo, 'total_registros': total, 'valores_nulos': nulos, 'porcentaje_nulos': pct_nulos, 'valores_unicos': unicos, 'porcentaje_unicos': pct_unicos, 'ejemplo_valor': ejemplo}
+
+def leer_csv (ruta):
+    try:
+        with open(ruta, 'r', encoding='utf-8') as f:
+            lineas=f.readlines()
+            if not lineas:
+                return [], []
+
+            encabezados=lineas[0].strip().split(',')
+            filas=[]
+            for linea in lineas[1:]:
+                linea_limpia=linea.strip()
+                if linea_limpia:
+                    filas.append(linea_limpia.split(','))
+            return encabezados, filas
+    except FileNotFoundError:
+        sys.exit(1)
