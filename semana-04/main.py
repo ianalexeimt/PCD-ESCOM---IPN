@@ -24,3 +24,21 @@ def crear_productos (datos_raw):
             pass
 
     return productos
+
+def main():
+    archivo_inventario='data/inventario.csv'
+    archivo_reporte='outputs/reporte_inventario.csv'
+
+    datos_raw=leer_inventario(archivo_inventario)
+    productos=crear_productos(datos_raw)
+
+    necesitan_reorden=[]
+    for p in productos:
+        if p.necesita_reorden():
+            necesitan_reorden.append(p)
+
+    necesitan_reorden=sorted(necesitan_reorden, key=lambda x: x.unidades_faltantes(), reverse=True)
+    escribir_reporte(necesitan_reorden, archivo_reporte)
+
+if __name__ == '__main__':
+    main()
