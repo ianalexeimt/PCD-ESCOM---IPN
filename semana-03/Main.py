@@ -39,3 +39,29 @@ def main():
 
             if producto not in productos:
                 productos[producto]={'unidades': 0, 'ingreso': 0.0}
+                
+            productos[producto]['unidades']+=cantidad
+            productos[producto]['ingreso']+=(cantidad * precio)
+
+    for prod in productos:
+        unidades=productos[prod]['unidades']
+        ingreso=productos[prod]['ingreso']
+        if unidades > 0:
+            promedio=ingreso/unidades
+        else:
+            promedio=0.0
+        productos[prod]['promedio']=promedio
+
+    sorted_products=sorted(productos.items(), key=lambda x: x[1]['ingreso'], reverse=True)
+
+    print('producto,unidades_vendidas,ingreso_total,precio_promedio')
+    for item in sorted_products:
+        nombre=item[0]
+        datos=item[1]
+        unidades_str=str(datos['unidades'])
+        ingreso_str=f"{datos['ingreso']:.2f}"
+        promedio_str=f"{datos['promedio']:.2f}"
+        print(f"{nombre},{unidades_str},{ingreso_str},{promedio_str}")
+
+if __name__ == '__main__':
+    main()
